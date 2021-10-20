@@ -1,3 +1,4 @@
+<script>
 var SGE = {};
 (function(){
   
@@ -12,7 +13,7 @@ var SGE = {};
       this.height = height;
       
       if(parent && typeof parent == "string")
-        if(this.parent = document.getElementById)
+        if(this.parent = document.getElementById(parent))
           this.parent.appendChild(this.canvas);
         else
           (this.parent = document.body).appendChild(this.canvas);
@@ -95,3 +96,4 @@ var SGE = {};
   SGE.Scene = Scene;
   
 })();
+</script>
