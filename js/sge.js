@@ -1,7 +1,5 @@
-<script>
 var SGE = {};
 (function(){
-  
   class Game
   {
     constructor(width, height, parent)
@@ -94,6 +92,4 @@ var SGE = {};
     }
   }
   SGE.Scene = Scene;
-  
 })();
-</script>
