@@ -58,10 +58,47 @@ var SGE = {};
       
       this.color = new Color(0x000000ff);
       
+      this.assets = {
+        audio: {},
+        image: {}
+      };
+      
+      this.sprites = [];
+      
       this.fps = fps;
       this.milliseconds = 0;
       this.framecount = 0;
       this.frameinterval;
+    }
+    addAsset(type, key, source)
+    {
+      if(type == "audio")
+        this.assets.audio[key] = new Audio(source);
+      
+      if(type == "image")
+        (this.assets.image[key] = new Image()).src = source;
+    }
+    addSprite(sprite)
+    {
+      scene.sprites.push(sprite);
+    }
+    drawNoTexture(sprite)
+    {
+      var ctx = sprite.scene.game.context;
+      
+      ctx.translate(sprite.x, sprite.y);
+      ctx.rotate(sprite.rotation);
+      
+      ctx.fillStyle = "#000000";
+      ctx.fillRect(-sprite.width/2, -sprite.height/2, sprite.width, sprite.height);
+      ctx.strokeStyle = "#00ff00";
+      ctx.strokeRect(-sprite.width/2, -sprite.height/2, sprite.width, sprite.height);
+      
+      ctx.restore();
+    }
+    drawTexture(sprite)
+    {
+      
     }
     start()
     {
@@ -89,7 +126,31 @@ var SGE = {};
       
       ctx.fillStyle = this.color.string;
       ctx.fillRect(0, 0, width, height);
+      
+      ctx.save();
+      
+      for(var i = 0; i < this.sprites.length; i++)
+      {
+      	if(!this.sprites[i].texture)
+      		this.drawNoTexture(this.sprites[i]);
+      }
     }
   }
   SGE.Scene = Scene;
+  
+  class Sprite
+  {
+    constructor(scene, x, y, texture = null)
+    {
+      scene.addSprite(this);
+      
+      this.scene = scene;
+      this.x = x;
+      this.y = y;
+      this.texture = texture;
+      this.width = texture ? scene.assets.image[texture].width : 64;
+      this.height = texture ? scene.assets.image[texture].height : 64;
+    }
+  }
+  SGE.Sprite = Sprite;
 })();
