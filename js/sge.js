@@ -56,7 +56,7 @@ var SGE = {};
       this.game = game;
       game.scene = this;
       
-      this.color = new Color(0x00000000);
+      this.color = new Color(0x000000ff);
       
       this.fps = fps;
       this.milliseconds = 0;
@@ -73,7 +73,7 @@ var SGE = {};
           scene.calculate();
           scene.animate();
         }
-      }, 1, this);
+      }, 100, this);
     }
     stop() { clearInterval(this.frameinterval); }
     calculate()
@@ -83,12 +83,12 @@ var SGE = {};
     animate()
     {
       var game = this.game;
-      var wid = game.width;
-      var hgt = game.height;
+      var width = game.width;
+      var height = game.height;
       var ctx = game.context;
       
       ctx.fillStyle = this.color.string;
-      ctx.fillRect(0, 0, wid, hgt);
+      ctx.fillRect(0, 0, width, height);
     }
   }
   SGE.Scene = Scene;
