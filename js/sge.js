@@ -23,7 +23,6 @@ var SGE = {};
     
     set width(value) { this.canvas.width = value; }
     get width() { return this.canvas.width; }
-    
     set height(value) { this.canvas.height = value; }
     get height() { return this.canvas.height; }
   }
@@ -37,13 +36,10 @@ var SGE = {};
     
     set r(value) { this.value = Math.floor(value) * 0x01000000 + this.value & 0x00ffffff; }
     get r() { return this.value & 0xff000000; }
-    
     set g(value) { this.value = Math.floor(value) * 0x00010000 + this.value & 0xff00ffff; }
     get g() { return this.value & 0x00ff0000; }
-    
     set b(value) { this.value = Math.floor(value) * 0x00000100 + this.value & 0xffff00ff; }
     get b() { return this.value & 0x0000ff00; }
-    
     set a(value) { this.value = Math.floor(value) * 0x00000001 + this.value & 0xffffff00; }
     get a() { return this.value & 0x000000ff; }
   }
@@ -69,19 +65,18 @@ var SGE = {};
       this.milliseconds = 0;
       this.framecount = 0;
       this.frameinterval;
+      
+      this.create = null;
+      this.update = null;
     }
     addAsset(type, key, source)
     {
       if(type == "audio")
         this.assets.audio[key] = new Audio(source);
-      
       if(type == "image")
         (this.assets.image[key] = new Image()).src = source;
     }
-    addSprite(sprite)
-    {
-      scene.sprites.push(sprite);
-    }
+    addSprite(sprite) { scene.sprites.push(sprite); }
     drawNoTexture(sprite)
     {
       var ctx = sprite.scene.game.context;
@@ -93,29 +88,43 @@ var SGE = {};
       ctx.fillRect(-sprite.width/2, -sprite.height/2, sprite.width, sprite.height);
       ctx.strokeStyle = "#00ff00";
       ctx.strokeRect(-sprite.width/2, -sprite.height/2, sprite.width, sprite.height);
+      ctx.beginPath();
+      ctx.moveTo(sprite.width/2, -sprite.height/2);
+      ctx.lineTo(-sprite.width/2, sprite.height/2);
+      ctx.stroke();
       
       ctx.restore();
     }
     drawTexture(sprite)
     {
+      var ctx = sprite.scene.game.context;
       
+      ctx.translate(sprite.x, sprite.y);
+      ctx.rotate(sprite.rotation);
+      
+      ctx.drawImage(this.assets.image[sprite.texture], -sprite.width/2, -sprite.height/2, sprite.width, sprite.height);
+      
+      ctx.restore();
     }
     start()
     {
-      this.frameinterval = setInterval(function(scene) {
-        scene.milliseconds++;
-        if(scene.milliseconds > scene.framecount * 1000 / scene.fps)
-        {
+    	setTimeout(function(scene) {
+      	if(scene.create)
+        	scene.create();
+        scene.frameinterval = setInterval(function() {
+          scene.milliseconds += 1000/scene.fps;
           scene.framecount++;
           scene.calculate();
           scene.animate();
-        }
-      }, 100, this);
+          if(scene.update)
+          	scene.update();
+        }, 1000/scene.fps);
+      }, 1000, this);
     }
     stop() { clearInterval(this.frameinterval); }
     calculate()
     {
-      
+      // Velocity, Collision, etc
     }
     animate()
     {
@@ -130,10 +139,10 @@ var SGE = {};
       ctx.save();
       
       for(var i = 0; i < this.sprites.length; i++)
-      {
       	if(!this.sprites[i].texture)
-      		this.drawNoTexture(this.sprites[i]);
-      }
+        	this.drawNoTexture(this.sprites[i]);
+        else
+      		this.drawTexture(this.sprites[i]);
     }
   }
   SGE.Scene = Scene;
@@ -147,9 +156,10 @@ var SGE = {};
       this.scene = scene;
       this.x = x;
       this.y = y;
+      this.rotation = 0;
       this.texture = texture;
-      this.width = texture ? scene.assets.image[texture].width : 64;
-      this.height = texture ? scene.assets.image[texture].height : 64;
+      this.width = texture ? scene.assets.image[texture].width : 32;
+      this.height = texture ? scene.assets.image[texture].height : 32;
     }
   }
   SGE.Sprite = Sprite;
